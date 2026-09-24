@@ -6,6 +6,14 @@
     <title>Mragank | Stark Interface</title>
 </head>
 <body>
+
+    <div class="hud-background">
+        <div class="hud-circle"></div>
+        <div class="hud-line-1"></div>
+        <div class="hud-line-2"></div>
+    </div>
+
+
     <header>
         <nav>
             <a href="#about">About</a>
@@ -18,14 +26,18 @@
     <main>
         <section id="hero">
             <h1>Hey, I'm Mragank Dubey</h1>
+            <div class="system-status">
+                <span class="status-dot"></span>
+                J.A.R.V.I.S ONLINE
+            </div>
             <h2>CSE (AI & ML) Student | Aspiring AI Engineer</h2>
             <!-- want this paragraph to be greatly animated or smthng -->
-            <p> I'm a first-year Computer Science student passionate about building practical software, AI-powered applications, and intelligent systems. I'm currently exploring backend development, AI/ML, APIs and full-stack development while turning what I learn into real projects.</p>
+            <p class="hero-description"> I'm a first-year Computer Science student passionate about building practical software, AI-powered applications, and intelligent systems. I'm currently exploring backend development, AI/ML, APIs and full-stack development while turning what I learn into real projects.</p>
             <!-- github icon -->
-            <a href="https://github.com/mragankdubey" target="_blank" rel="noopener noreferrer">Github</a>
+            <a class="github-btn" href="https://github.com/mragankdubey" target="_blank" rel="noopener noreferrer">Github</a>
 
             <div class="ironman-container">
-                <img src="images/ironman.png" alt="Iron-Man suit" class="ironman">
+                <img src="images/ironman.jpeg" alt="Iron-Man suit" class="ironman">
                 <img src="images/mragank.png" alt="Mragank" class="face">
             </div>
             
@@ -33,23 +45,40 @@
 
         <section id="about">
             <h2>Profile</h2>
-            <div>
-                <h3>Name</h3>
-                <p>Mragank Dubey</p>
+            <div class="profile-grid">
+                <div>
+                    <h3>Name</h3>
+                    <p>Mragank Dubey</p>
+                </div>
 
-                <h3>Course</h3>
-                <p>BTech CSE (AI & ML)</p>
+                <div>
+                    <h3>Course</h3>
+                    <p>BTech CSE (AI & ML)</p>
+                </div>
 
-                <h3>Duration</h3>
-                <p>2026 - 2030</p>
+                <div>
+                    <h3>Duration</h3>
+                    <p>2026 - 2030</p>
+                </div>
             </div>
-            <p>
-                <br><b>Interests : </b>AI powered applications, Backend Development & building practical projects.
-                <br>Currently Learning FastAPI and SQL while strengthening my foundations in AI/ML
-            </p>
 
-            <h2>About Me</h2>
-            <p>I'm a CSE (AI & ML) student who enjoys turning ideas into working projects. I'm focused on becoming an AI Engineer by building strong foundations in programming, backend development, and machine learning.</p>
+            <div class="about-text">
+                <p>
+                    <strong>Interests:</strong>
+                    AI-powered applications, Backend Development & building practical projects.
+                </p>
+                <p>
+                    <strong>Currently Learning:</strong>
+                    FastAPI and SQL while strengthening my foundations in AI/ML.
+                </p>
+                <h3>About Me</h3>
+                <p>
+                    I'm a CSE (AI & ML) student who enjoys turning ideas into
+                    working projects. I'm focused on becoming an AI Engineer by
+                    building strong foundations in programming, backend development,
+                    and machine learning.
+                </p>
+            </div>
 
         </section>
 
@@ -107,6 +136,20 @@
             </article>
         </section>
 
+        <div class="jarvis">
+
+            <button class="jarvis-button">
+                <img src="images/jarvis.png" alt="JARVIS">
+            </button>
+
+        </div>
+
+        <div class="jarvis-window">
+            <div class="jarvis-header">
+                <h2>JARVIS</h2>
+                <span>ONLINE</span>
+            </div>
+        </div>
 
     </main>
 </body>
