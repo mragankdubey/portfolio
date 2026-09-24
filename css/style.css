@@ -192,6 +192,24 @@ section {
     display: block;
 }
 
+/* Portrait Layer */
+
+.face {
+    position: absolute;
+    width: min(500px, 90%);
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    z-index: 1;
+    pointer-events: none;
+    clip-path: circle(0% at 50% 50%);
+}
+
+.ironman {
+    position: relative;
+    z-index: 2;
+}
+
 body::after {
     content: "";
     position: fixed;
@@ -296,43 +314,35 @@ body::after {
     pointer-events: none;
     animation: hud-spin 12s linear infinite;
 }
-
 .hud-reticle::before,
 .hud-reticle::after {
     content: "";
     position: absolute;
     background: rgba(255, 0, 0, 0.5);
 }
-
 .hud-reticle::before {
     width: 140%;
     height: 1px;
     top: 50%;
     left: -20%;
 }
-
 .hud-reticle::after {
     width: 1px;
     height: 140%;
     left: 50%;
     top: -20%;
 }
-
 .hud-reticle {
     box-shadow:
         0 0 10px rgba(255, 0, 0, 0.25),
         inset 0 0 10px rgba(255, 0, 0, 0.15);
 }
-
 .hud-reticle::before {
     box-shadow: 0 0 6px rgba(255, 0, 0, 0.5);
 }
-
 .hud-reticle::after {
     box-shadow: 0 0 6px rgba(255, 0, 0, 0.5);
 }
-
-
 @keyframes hud-spin {
     from {
         transform: rotate(0deg);
@@ -351,14 +361,10 @@ main > section:not(#hero) {
 
 .hud-label {
     position: absolute;
-
     color: rgba(255, 60, 60, 0.75);
-
     font-size: 10px;
     letter-spacing: 3px;
-
     pointer-events: none;
-
     text-shadow:
         0 0 8px rgba(255, 0, 0, 0.5);
 }
@@ -375,21 +381,15 @@ main > section:not(#hero) {
 
 .scan-line {
     position: absolute;
-
     width: 70%;
     height: 1px;
-
     left: 15%;
     top: 20%;
-
     background: rgba(255, 0, 0, 0.7);
-
     box-shadow:
         0 0 8px rgba(255, 0, 0, 0.8),
         0 0 20px rgba(255, 0, 0, 0.4);
-
     pointer-events: none;
-
     animation: scan 4s ease-in-out infinite;
 }
 
