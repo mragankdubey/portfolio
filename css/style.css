@@ -4,7 +4,6 @@
     padding: 0;
     box-sizing: border-box;
 }
-
 html {
     scroll-behavior: smooth;
 }
@@ -28,7 +27,35 @@ body {
     font-family: Arial, sans-serif;
 }
 
+/* Stark Grid */
 
+body {
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: "";
+
+    position: fixed;
+    inset: 0;
+
+    pointer-events: none;
+    z-index: -1;
+
+    background-image:
+        linear-gradient(
+            rgba(255, 0, 0, 0.035) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255, 0, 0, 0.035) 1px,
+            transparent 1px
+        );
+
+    background-size: 50px 50px;
+}
 
 header {
     width: 100%;
@@ -119,10 +146,8 @@ nav a:hover {
 
 .hero-content > p:not(.hero-greeting) {
     color: #aaaaaa;
-
     font-size: 17px;
     line-height: 1.7;
-
     margin-bottom: 30px;
 }
 
@@ -132,16 +157,11 @@ section {
 
 .hero-content > a {
     display: inline-block;
-
     padding: 12px 25px;
-
     border: 1px solid #ff2020;
-
     color: #ffffff;
     text-decoration: none;
-
     letter-spacing: 1px;
-
     transition:
         background 0.3s ease,
         box-shadow 0.3s ease,
@@ -150,11 +170,9 @@ section {
 
 .hero-content > a:hover {
     background: #ff2020;
-
     box-shadow:
         0 0 15px rgba(255, 0, 0, 0.6),
         0 0 35px rgba(255, 0, 0, 0.25);
-
     transform: translateY(-3px);
 }
 
@@ -162,17 +180,236 @@ section {
 
 .ironman-container {
     position: relative;
-
     display: flex;
     justify-content: center;
     align-items: center;
-
     min-height: 600px;
 }
 
 .ironman {
     width: min(500px, 90%);
     height: auto;
-
     display: block;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background:
+        radial-gradient(
+            circle at 15% 40%,
+            rgba(255, 0, 0, 0.08),
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 85% 70%,
+            rgba(255, 0, 0, 0.06),
+            transparent 25%
+        );
+}
+
+/* Hero Visual */
+
+#hero {
+    position: relative;
+}
+
+.hero-content h1 {
+    text-shadow:
+        0 0 20px rgba(255, 0, 0, 0.08);
+}
+
+.hero-content h2 {
+    letter-spacing: 1px;
+}
+
+.ironman-container::before {
+    content: "";
+    position: absolute;
+    width: 450px;
+    height: 450px;
+    border-radius: 50%;
+    background: rgba(255, 0, 0, 0.08);
+    filter: blur(80px);
+    z-index: -1;
+}
+
+.ironman {
+    width: min(500px, 90%);
+    height: auto;
+    display: block;
+    filter:
+        drop-shadow(0 0 15px rgba(255, 0, 0, 0.15));
+    transition:
+        transform 0.5s ease,
+        filter 0.5s ease;
+}
+
+.ironman-container:hover .ironman {
+    transform: scale(1.02);
+    filter:
+        drop-shadow(0 0 20px rgba(255, 0, 0, 0.35));
+}
+
+.system-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    color: #777777;
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ff2020;
+    box-shadow:
+        0 0 8px rgba(255, 0, 0, 0.8);
+    animation: status-pulse 2s ease-in-out infinite;
+}
+@keyframes status-pulse {
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+/* Recticle */
+
+.hud-reticle {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border: 1px solid rgba(255, 0, 0, 0.35);
+    border-radius: 50%;
+    top: 25%;
+    right: 18%;
+    pointer-events: none;
+    animation: hud-spin 12s linear infinite;
+}
+
+.hud-reticle::before,
+.hud-reticle::after {
+    content: "";
+    position: absolute;
+    background: rgba(255, 0, 0, 0.5);
+}
+
+.hud-reticle::before {
+    width: 140%;
+    height: 1px;
+    top: 50%;
+    left: -20%;
+}
+
+.hud-reticle::after {
+    width: 1px;
+    height: 140%;
+    left: 50%;
+    top: -20%;
+}
+
+.hud-reticle {
+    box-shadow:
+        0 0 10px rgba(255, 0, 0, 0.25),
+        inset 0 0 10px rgba(255, 0, 0, 0.15);
+}
+
+.hud-reticle::before {
+    box-shadow: 0 0 6px rgba(255, 0, 0, 0.5);
+}
+
+.hud-reticle::after {
+    box-shadow: 0 0 6px rgba(255, 0, 0, 0.5);
+}
+
+
+@keyframes hud-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+section {
+    scroll-margin-top: 100px;
+}
+main > section:not(#hero) {
+    padding: 120px 10%;
+}
+
+.hud-label {
+    position: absolute;
+
+    color: rgba(255, 60, 60, 0.75);
+
+    font-size: 10px;
+    letter-spacing: 3px;
+
+    pointer-events: none;
+
+    text-shadow:
+        0 0 8px rgba(255, 0, 0, 0.5);
+}
+
+.hud-label-top {
+    top: 15%;
+    right: 5%;
+}
+
+.hud-label-bottom {
+    bottom: 15%;
+    left: 5%;
+}
+
+.scan-line {
+    position: absolute;
+
+    width: 70%;
+    height: 1px;
+
+    left: 15%;
+    top: 20%;
+
+    background: rgba(255, 0, 0, 0.7);
+
+    box-shadow:
+        0 0 8px rgba(255, 0, 0, 0.8),
+        0 0 20px rgba(255, 0, 0, 0.4);
+
+    pointer-events: none;
+
+    animation: scan 4s ease-in-out infinite;
+}
+
+@keyframes scan {
+    0% {
+        top: 20%;
+        opacity: 0;
+    }
+    15% {
+        opacity: 1;
+    }
+    50% {
+        top: 75%;
+        opacity: 0.8;
+    }
+    85% {
+        opacity: 1;
+    }
+    100% {
+        top: 20%;
+        opacity: 0;
+    }
 }
