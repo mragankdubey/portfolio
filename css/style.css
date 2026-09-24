@@ -1,0 +1,178 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(
+            circle at 50% 15%,
+            rgba(180, 0, 0, 0.35),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 80% 60%,
+            rgba(100, 0, 0, 0.12),
+            transparent 30%
+        ),
+        #080808;
+
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+}
+
+
+
+header {
+    width: 100%;
+    padding: 25px 60px;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    z-index: 1000;
+
+    background: rgba(8, 8, 8, 0.75);
+    backdrop-filter: blur(10px);
+
+    border-bottom: 1px solid rgba(255, 0, 0, 0.15);
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 45px;
+}
+
+nav a {
+    color: #ffffff;
+    text-decoration: none;
+
+    font-size: 15px;
+    letter-spacing: 2px;
+
+    transition:
+        color 0.3s ease,
+        text-shadow 0.3s ease;
+}
+
+nav a:hover {
+    color: #ff2020;
+
+    text-shadow:
+        0 0 8px rgba(255, 0, 0, 0.8),
+        0 0 18px rgba(255, 0, 0, 0.4);
+}
+
+/* Hero */
+
+
+#hero {
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 60px;
+
+    padding: 140px 10% 80px;
+}
+
+.hero-content {
+    max-width: 650px;
+}
+
+.hero-greeting {
+    color: #ff2020;
+
+    font-size: 14px;
+    letter-spacing: 4px;
+
+    margin-bottom: 20px;
+}
+
+.hero-content h1 {
+    font-size: clamp(45px, 6vw, 80px);
+    line-height: 1;
+
+    margin-bottom: 20px;
+}
+
+.hero-content h2 {
+    color: #bbbbbb;
+
+    font-size: 20px;
+    font-weight: 400;
+
+    margin-bottom: 25px;
+}
+
+.hero-content > p:not(.hero-greeting) {
+    color: #aaaaaa;
+
+    font-size: 17px;
+    line-height: 1.7;
+
+    margin-bottom: 30px;
+}
+
+section {
+    scroll-margin-top: 100px;
+}
+
+.hero-content > a {
+    display: inline-block;
+
+    padding: 12px 25px;
+
+    border: 1px solid #ff2020;
+
+    color: #ffffff;
+    text-decoration: none;
+
+    letter-spacing: 1px;
+
+    transition:
+        background 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.3s ease;
+}
+
+.hero-content > a:hover {
+    background: #ff2020;
+
+    box-shadow:
+        0 0 15px rgba(255, 0, 0, 0.6),
+        0 0 35px rgba(255, 0, 0, 0.25);
+
+    transform: translateY(-3px);
+}
+
+/* IronMan positioning */
+
+.ironman-container {
+    position: relative;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-height: 600px;
+}
+
+.ironman {
+    width: min(500px, 90%);
+    height: auto;
+
+    display: block;
+}
