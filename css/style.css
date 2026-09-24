@@ -413,3 +413,31 @@ main > section:not(#hero) {
         opacity: 0;
     }
 }
+
+/* Face reveal appear above Iron Man */
+.face {
+    z-index: 3;
+}
+
+/* Align */
+.face {
+    position: absolute;
+
+    width: min(500px, 90%);
+    aspect-ratio: 1080 / 1157;
+
+    height: auto;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    object-fit: cover;
+    object-position: center 250%;
+
+    z-index: 3;
+    pointer-events: none;
+
+    clip-path: circle(0px at 50% 50%);
+}

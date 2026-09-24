@@ -18,7 +18,7 @@ if (ironmanContainer && face) {
 
         // Reveal your face around the cursor
         face.style.clipPath =
-            `circle(75px at ${xPercent}% ${yPercent}%)`;
+            `circle(90px at ${xPercent}% ${yPercent}%)`;
 
     });
 
@@ -30,3 +30,5 @@ if (ironmanContainer && face) {
     });
 
 }
+
+
