@@ -288,3 +288,46 @@ quickQuestions.forEach((button) => {
         askJarvis(question);
     });
 });
+
+/* =========================================================
+   NAV ACTIVE SECTION
+   ========================================================= */
+
+const navLinks = document.querySelectorAll(".nav-link");
+
+const sections = document.querySelectorAll(
+    "#about, #skills, #projects, #contact"
+);
+
+
+const navObserver = new IntersectionObserver(
+    (entries) => {
+
+        entries.forEach((entry) => {
+
+            if (entry.isIntersecting) {
+
+                navLinks.forEach((link) => {
+                    link.classList.remove("active");
+                });
+
+                const activeLink =
+                    document.querySelector(
+                        `.nav-link[href="#${entry.target.id}"]`
+                    );
+
+                if (activeLink) {
+                    activeLink.classList.add("active");
+                }
+            }
+        });
+
+    },
+    {
+        threshold: 0.35
+    }
+);
+
+sections.forEach((section) => {
+    navObserver.observe(section);
+});
