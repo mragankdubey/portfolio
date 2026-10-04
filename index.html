@@ -514,7 +514,6 @@
                         <span>DISCORD.PY</span>
                         <span>BRAWL API</span>
                     </div>
-
                     <a href="https://github.com/mragankdubey/Brawldex" target="_blank" rel="noopener noreferrer">ACCESS SYSTEM</a>
                 </div>
 
@@ -559,7 +558,7 @@
                     </p>
                 </div>
 
-                <form>
+                <form id="contact-form">
                     <label for="name">Name</label>
                     <input
                         type="text"
@@ -582,7 +581,9 @@
                         name="message"
                         placeholder="Your message"
                     ></textarea>
-                    <button type="submit">Submit</button>
+                    
+                    <button type="submit" id="contact-submit">Submit</button>
+                    <p id="contact-status"></p>
                 </form>
 
             </div>
@@ -683,17 +684,12 @@
 
                 </div>
 
-                <form class="jarvis-input">
-                    <input
-                        type="text"
-                        placeholder="Ask JARVIS..."
-                        autocomplete="off"
-                    >
+                <form id="jarvis-form">
+                    <input type="text" id="jarvis-input" placeholder="Ask Jarvis..." autocomplete="off" >
 
-                    <button type="submit">
-                        SEND
-                    </button>
+                    <button type="submit">SEND</button>
                 </form>
+
             </div>
         </div>
     </main>

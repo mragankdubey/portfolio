@@ -86,8 +86,8 @@ const jarvis = document.querySelector(".jarvis");
 const jarvisButton = document.querySelector(".jarvis-button");
 const jarvisWindow = document.querySelector(".jarvis-window");
 const chatWindow = document.querySelector(".chat-window");
-const jarvisInput = document.querySelector(".jarvis-input");
-const jarvisTextInput = document.querySelector(".jarvis-input input");
+const jarvisInput = document.querySelector("#jarvis-form");
+const jarvisTextInput = document.querySelector("#jarvis-input");
 const quickQuestions = document.querySelectorAll(
     ".jarvis-quick button"
 );
@@ -154,16 +154,27 @@ function getJarvisResponse(question) {
         question.toLowerCase().trim();
 
     if (
-        q.includes("who is mragank") ||
-        q.includes("about mragank") ||
+    q.includes("who is mragank") ||
+    q.includes("about mragank") ||
+    q.includes("tell me about him")
+) {
+    return `
+        Mragank Dubey is a CSE (AI & ML) student
+        focused on software development, AI-powered
+        applications, backend systems and intelligent
+        interfaces.
+    `;
+}
+
+    if (
         q.includes("who are you") ||
-        q.includes("tell me about him")
+        q.includes("what are you")
     ) {
         return `
-            Mragank Dubey is a CSE (AI & ML) student
-            focused on software development, AI-powered
-            applications, backend systems and intelligent
-            interfaces.
+            I am JARVIS, the personal AI assistant
+            integrated into Mragank's portfolio.
+            I can help visitors explore his skills,
+            projects and development journey.
         `;
     }
 
@@ -251,20 +262,48 @@ function getJarvisResponse(question) {
         career goals, or contact information.
     `;
 }
-function askJarvis(question) {
+async function askJarvis(question) {
     question = question.trim();
+
     if (!question) {
         return;
     }
+
     addUserMessage(question);
-    const thinking =
-        showThinking();
-    setTimeout(() => {
+    const thinking = showThinking();
+
+    try {
+        const response = await fetch(
+            "http://127.0.0.1:8000/chat",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: question
+                })
+            }
+        );
+        if (!response.ok) {
+            throw new Error("JARVIS backend error");
+        }
+
+        const data = await response.json();
         thinking.remove();
-        const response =
+        addJarvisMessage(data.response);
+
+    } catch (error) {
+        console.error(
+            "JARVIS connection error:",
+            error
+        );
+        thinking.remove();
+
+        const fallback =
             getJarvisResponse(question);
-        addJarvisMessage(response);
-    }, 700);
+        addJarvisMessage(fallback);
+    }
 }
 if (jarvisInput) {
     jarvisInput.addEventListener(
@@ -289,12 +328,9 @@ quickQuestions.forEach((button) => {
     });
 });
 
-/* =========================================================
-   NAV ACTIVE SECTION
-   ========================================================= */
+// Nav 
 
 const navLinks = document.querySelectorAll(".nav-link");
-
 const sections = document.querySelectorAll(
     "#about, #skills, #projects, #contact"
 );
@@ -302,11 +338,9 @@ const sections = document.querySelectorAll(
 
 const navObserver = new IntersectionObserver(
     (entries) => {
-
         entries.forEach((entry) => {
 
             if (entry.isIntersecting) {
-
                 navLinks.forEach((link) => {
                     link.classList.remove("active");
                 });
@@ -321,7 +355,6 @@ const navObserver = new IntersectionObserver(
                 }
             }
         });
-
     },
     {
         threshold: 0.35

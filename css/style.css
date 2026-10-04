@@ -1896,7 +1896,6 @@ main > section:not(#hero) {
 }
 
 #contact form button::before {
-
     content: "";
     position: absolute;
     inset: 0;
@@ -2082,7 +2081,6 @@ footer p {
     }
 }
 
-
 @keyframes jarvis-ring-reverse {
     from {
         transform: rotate(360deg);
@@ -2207,7 +2205,6 @@ footer p {
         jarvis-online 1.5s ease-in-out infinite;
 }
 
-
 @keyframes jarvis-online {
     0%,
     100% {
@@ -2289,14 +2286,12 @@ footer p {
     font-size: 11px;
 }
 
-
 .jarvis-window > form input:focus {
     border-color:
         rgba(255, 30, 30, 0.7);
     box-shadow:
         0 0 12px rgba(255, 0, 0, 0.1);
 }
-
 
 .jarvis-window > form input::placeholder {
     color: #444;
