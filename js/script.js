@@ -364,58 +364,166 @@ const navObserver = new IntersectionObserver(
 sections.forEach((section) => {
     navObserver.observe(section);
 });
+// =========================================
+// CONTACT FORM
+// =========================================
 
-// Contact Form
 const contactForm = document.querySelector("#contact-form");
+
 if (contactForm) {
-    contactForm.addEventListener("submit", async (event) => {
 
-        event.preventDefault();
+    const statusBox =
+        document.querySelector("#contact-status");
 
-        const name = document.querySelector("#name").value.trim();
-        const email = document.querySelector("#email").value.trim();
-        const message = document.querySelector("#message").value.trim();
-        const submitButton = contactForm.querySelector("button");
+    const statusTitle =
+        statusBox.querySelector(".status-title");
 
-        submitButton.disabled = true;
-        submitButton.textContent = "TRANSMITTING...";
+    const statusMessage =
+        statusBox.querySelector(".status-message");
 
-        try {
-            const response = await fetch(
-                "http://127.0.0.1:8000/contact",
-                {
-                    method: "POST",
+    const submitButton =
+        document.querySelector("#contact-submit");
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
 
-                    body: JSON.stringify({
-                        name: name,
-                        email: email,
-                        message: message
-                    })
-                }
-            );
+    function updateContactStatus(
+        state,
+        title,
+        message
+    ) {
 
-            const data = await response.json();
+        statusBox.classList.remove(
+            "transmitting",
+            "success",
+            "error"
+        );
 
-            if (!response.ok || !data.success) {
-                throw new Error(data.message || "Message failed");
-            }
-            alert("Message transmitted successfully.");
-            contactForm.reset();
-
-        } catch (error) {
-
-            console.error("Contact form error:", error);
-            alert(
-                "Unable to transmit message. Please try again."
-            );
-
-        } finally {
-            submitButton.disabled = false;
-            submitButton.textContent = "Submit";
+        if (state) {
+            statusBox.classList.add(state);
         }
-    });
+
+        statusTitle.textContent = title;
+        statusMessage.textContent = message;
+    }
+
+
+    contactForm.addEventListener(
+        "submit",
+        async (event) => {
+
+            event.preventDefault();
+
+
+            const name =
+                document.querySelector("#name")
+                    .value.trim();
+
+            const email =
+                document.querySelector("#email")
+                    .value.trim();
+
+            const message =
+                document.querySelector("#message")
+                    .value.trim();
+
+
+            /* -------------------------
+               TRANSMISSION START
+            ------------------------- */
+
+            submitButton.disabled = true;
+
+            submitButton.textContent =
+                "TRANSMITTING...";
+
+
+            updateContactStatus(
+                "transmitting",
+                "TRANSMISSION ACTIVE",
+                "Establishing secure communication channel..."
+            );
+
+
+            try {
+
+                const response = await fetch(
+                    "http://127.0.0.1:8000/contact",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            name: name,
+                            email: email,
+                            message: message
+                        })
+                    }
+                );
+
+
+                const data =
+                    await response.json();
+
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+                    throw new Error(
+                        data.message ||
+                        "Message transmission failed"
+                    );
+                }
+
+
+                /* -------------------------
+                   SUCCESS
+                ------------------------- */
+
+                updateContactStatus(
+                    "success",
+                    "TRANSMISSION COMPLETE",
+                    "Your message has been securely delivered to Mragank."
+                );
+
+
+                submitButton.textContent =
+                    "MESSAGE TRANSMITTED";
+
+
+                contactForm.reset();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Contact form error:",
+                    error
+                );
+
+
+                /* -------------------------
+                   ERROR
+                ------------------------- */
+
+                updateContactStatus(
+                    "error",
+                    "TRANSMISSION FAILED",
+                    "Unable to establish communication. Please try again."
+                );
+
+
+                submitButton.textContent =
+                    "RETRY TRANSMISSION";
+
+
+            } finally {
+
+                submitButton.disabled = false;
+            }
+        }
+    );
 }

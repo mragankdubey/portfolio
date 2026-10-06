@@ -582,8 +582,25 @@
                         placeholder="Your message"
                     ></textarea>
                     
-                    <button type="submit" id="contact-submit">Submit</button>
-                    <p id="contact-status"></p>
+                    <button type="submit" id="contact-submit">
+                        TRANSMIT MESSAGE
+                    </button>
+
+                    <div id="contact-status" class="contact-status" aria-live="polite">
+
+                        <div class="status-core">
+                            <span></span>
+                        </div>
+
+                        <div class="status-content">
+                            <span class="status-label">SYSTEM STATUS</span>
+                            <strong class="status-title">READY</strong>
+                            <p class="status-message">
+                                Awaiting transmission.
+                            </p>
+                        </div>
+
+                    </div>
                 </form>
 
             </div>
