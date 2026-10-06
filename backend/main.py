@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 import os
+import smtplib
+from email.message import EmailMessage
 
 
 load_dotenv()
@@ -27,6 +29,11 @@ if not GEMINI_API_KEY:
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 class ChatRequest(BaseModel):
+    message: str
+
+class ContactRequest(BaseModel):
+    name: str
+    email: str
     message: str
 
 @app.get("/")
@@ -108,3 +115,58 @@ async def chat(request: ChatRequest):
     )
 )   
     return {"response": response.text}
+
+@app.post("/contact")
+def contact(request: ContactRequest):
+
+    email = EmailMessage()
+
+    email["Subject"] = f"Portfolio Contact: {request.name}"
+    email["From"] = os.getenv("SMTP_EMAIL")
+    email["To"] = os.getenv("CONTACT_EMAIL")
+    email["Reply-To"] = request.email
+
+    email.set_content(
+        f"""
+NEW PORTFOLIO MESSAGE
+=====================
+
+Name:
+{request.name}
+
+Email:
+{request.email}
+
+Message:
+{request.message}
+
+=====================
+Sent from Mragank's Portfolio
+"""
+    )
+
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+
+            server.starttls()
+
+            server.login(
+                os.getenv("SMTP_EMAIL"),
+                os.getenv("SMTP_PASSWORD")
+            )
+
+            server.send_message(email)
+
+        return {
+            "success": True,
+            "message": "Message sent successfully."
+        }
+
+    except Exception as error:
+
+        print("Email error:", error)
+
+        return {
+            "success": False,
+            "message": "Unable to send message."
+        }

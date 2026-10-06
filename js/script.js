@@ -364,3 +364,58 @@ const navObserver = new IntersectionObserver(
 sections.forEach((section) => {
     navObserver.observe(section);
 });
+
+// Contact Form
+const contactForm = document.querySelector("#contact-form");
+if (contactForm) {
+    contactForm.addEventListener("submit", async (event) => {
+
+        event.preventDefault();
+
+        const name = document.querySelector("#name").value.trim();
+        const email = document.querySelector("#email").value.trim();
+        const message = document.querySelector("#message").value.trim();
+        const submitButton = contactForm.querySelector("button");
+
+        submitButton.disabled = true;
+        submitButton.textContent = "TRANSMITTING...";
+
+        try {
+            const response = await fetch(
+                "http://127.0.0.1:8000/contact",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        message: message
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || "Message failed");
+            }
+            alert("Message transmitted successfully.");
+            contactForm.reset();
+
+        } catch (error) {
+
+            console.error("Contact form error:", error);
+            alert(
+                "Unable to transmit message. Please try again."
+            );
+
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = "Submit";
+        }
+    });
+}
