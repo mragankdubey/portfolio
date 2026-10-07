@@ -527,3 +527,164 @@ if (contactForm) {
         }
     );
 }
+
+// =========================================================
+// MOBILE NAVIGATION
+// CHECKPOINT 1
+// =========================================================
+
+(function () {
+
+    const header =
+        document.querySelector("#main-header");
+
+    const menuToggle =
+        document.querySelector(".nav-menu-toggle");
+
+    const mainNav =
+        document.querySelector("#main-nav");
+
+    const mobileNavLinks =
+        document.querySelectorAll("#main-nav .nav-link");
+
+
+    if (!header || !menuToggle || !mainNav) {
+        return;
+    }
+
+
+    function openMobileMenu() {
+
+        header.classList.add("menu-open");
+
+        document.body.classList.add(
+            "mobile-menu-open"
+        );
+
+        menuToggle.setAttribute(
+            "aria-expanded",
+            "true"
+        );
+
+        menuToggle.setAttribute(
+            "aria-label",
+            "Close navigation menu"
+        );
+
+    }
+
+
+    function closeMobileMenu() {
+
+        header.classList.remove("menu-open");
+
+        document.body.classList.remove(
+            "mobile-menu-open"
+        );
+
+        menuToggle.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+        menuToggle.setAttribute(
+            "aria-label",
+            "Open navigation menu"
+        );
+
+    }
+
+
+    function toggleMobileMenu() {
+
+        const isOpen =
+            header.classList.contains("menu-open");
+
+        if (isOpen) {
+            closeMobileMenu();
+        } else {
+            openMobileMenu();
+        }
+
+    }
+
+
+    /* Hamburger */
+
+    menuToggle.addEventListener(
+        "click",
+        toggleMobileMenu
+    );
+
+
+    /* Close after selecting a section */
+
+    mobileNavLinks.forEach((link) => {
+
+        link.addEventListener(
+            "click",
+            () => {
+                closeMobileMenu();
+            }
+        );
+
+    });
+
+
+    /* Escape closes menu */
+
+    document.addEventListener(
+        "keydown",
+        (event) => {
+
+            if (
+                event.key === "Escape" &&
+                header.classList.contains("menu-open")
+            ) {
+                closeMobileMenu();
+
+                menuToggle.focus();
+            }
+
+        }
+    );
+
+
+    /* Clicking outside closes menu */
+
+    document.addEventListener(
+        "click",
+        (event) => {
+
+            if (
+                !header.classList.contains("menu-open")
+            ) {
+                return;
+            }
+
+
+            if (
+                !header.contains(event.target)
+            ) {
+                closeMobileMenu();
+            }
+
+        }
+    );
+
+
+    /* If screen becomes desktop again,
+       reset mobile state */
+
+    window.addEventListener(
+        "resize",
+        () => {
+
+            if (window.innerWidth > 768) {
+                closeMobileMenu();
+            }
+
+        }
+    );
+
+})();
