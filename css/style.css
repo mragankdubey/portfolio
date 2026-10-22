@@ -4018,3 +4018,231 @@ footer > p {
     }
 
 }
+
+
+/* =================================
+   STARK SYSTEM STARTUP SCREEN
+================================= */
+
+#stark-intro {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(100, 15, 20, 0.22),
+            transparent 38%
+        ),
+        #050608;
+
+    color: #f2f2f2;
+    text-align: center;
+    overflow: hidden;
+}
+
+.intro-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding: 24px;
+}
+
+.intro-label {
+    color: #e14b50;
+    font-size: 11px;
+    letter-spacing: 4px;
+    font-family: monospace;
+}
+
+.intro-title {
+    font-size: clamp(24px, 4vw, 42px);
+    letter-spacing: 4px;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* ARC REACTOR BUTTON */
+
+#reactor-activate {
+    position: relative;
+    width: 190px;
+    height: 190px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    margin: 12px 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.intro-reactor-ring {
+    position: absolute;
+    border: 2px solid rgba(255, 55, 65, 0.7);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.ring-one {
+    inset: 8px;
+    border-top-color: #ff5961;
+    animation: reactor-spin 8s linear infinite;
+}
+
+.ring-two {
+    inset: 23px;
+    border-style: dashed;
+    border-color: rgba(255, 90, 100, 0.65);
+    animation: reactor-spin 12s linear infinite reverse;
+}
+
+.ring-three {
+    inset: 39px;
+    border-color: rgba(255, 160, 165, 0.6);
+    animation: reactor-pulse 2s ease-in-out infinite;
+}
+
+.intro-reactor-core {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(
+        circle,
+        #fff 0%,
+        #ffb9bd 12%,
+        #ff303c 38%,
+        #7a0810 72%,
+        #160306 100%
+    );
+    box-shadow:
+        0 0 15px #ff303c,
+        0 0 40px rgba(255, 35, 50, 0.75),
+        0 0 80px rgba(255, 35, 50, 0.25);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.intro-reactor-core span {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    transform: rotate(45deg);
+    box-shadow: 0 0 12px white;
+}
+
+#reactor-activate:hover .intro-reactor-core {
+    transform: scale(1.12);
+    box-shadow:
+        0 0 25px #ff303c,
+        0 0 60px rgba(255, 35, 50, 0.9),
+        0 0 100px rgba(255, 35, 50, 0.4);
+}
+
+#reactor-activate:focus-visible {
+    outline: 2px solid #ff5961;
+    outline-offset: 8px;
+}
+
+.intro-status {
+    color: #ff5961;
+    font-family: monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    margin: 0;
+    animation: reactor-pulse 2s ease-in-out infinite;
+}
+
+.intro-instruction {
+    color: #85858d;
+    font-family: monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+@keyframes reactor-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes reactor-pulse {
+    0%, 100% {
+        opacity: 0.65;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+/* Keep the portfolio in place behind the intro */
+
+body.intro-active {
+    overflow: hidden;
+}
+
+/* Used by JavaScript when startup finishes */
+
+#stark-intro.intro-exit {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+        opacity 0.7s ease,
+        visibility 0.7s ease;
+}
+
+@media (max-width: 600px) {
+    .intro-content {
+        gap: 15px;
+    }
+
+    .intro-title {
+        letter-spacing: 2px;
+    }
+
+    .intro-label {
+        font-size: 9px;
+        letter-spacing: 2px;
+    }
+
+    #reactor-activate {
+        width: 160px;
+        height: 160px;
+    }
+
+    .intro-status {
+        font-size: 10px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ring-one,
+    .ring-two,
+    .ring-three,
+    .intro-status {
+        animation: none;
+    }
+}
+
+.intro-reactor-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 18px rgba(0, 230, 255, 0.65));
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+#reactor-activate:hover .intro-reactor-image {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 30px rgba(0, 230, 255, 0.9));
+}

@@ -170,3 +170,6 @@ Sent from Mragank's Portfolio
             "success": False,
             "message": "Unable to send message."
         }
+
+# cd backend
+#python -m uvicorn main:app --reload

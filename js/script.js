@@ -688,3 +688,28 @@ if (contactForm) {
     );
 
 })();
+
+
+/* STARK SYSTEM STARTUP */
+
+document.addEventListener("DOMContentLoaded", () => {
+    const intro = document.getElementById("stark-intro");
+    const reactorButton = document.getElementById("reactor-activate");
+
+    if (!intro || !reactorButton) return;
+
+    document.body.classList.add("intro-active");
+
+    reactorButton.addEventListener("click", () => {
+        reactorButton.disabled = true;
+
+        const status = intro.querySelector(".intro-status");
+        const instruction = intro.querySelector(".intro-instruction");
+
+        if (status) status.textContent = "SYSTEM ONLINE";
+        if (instruction) instruction.textContent = "WELCOME TO STARK INTERFACE";
+
+        intro.classList.add("intro-exit");
+        document.body.classList.remove("intro-active");
+    });
+});
