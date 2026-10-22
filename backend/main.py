@@ -108,7 +108,7 @@ your primary role is to assist visitors exploring the portfolio.
 async def chat(request: ChatRequest):
     try:
         response = client.models.generate_content(
-            model="gemini-3.8-flash",
+            model="gemini-3.5-flash-lite",
             contents=request.message,
             config=types.GenerateContentConfig(
                 system_instruction=JARVIS_SYSTEM_PROMPT
