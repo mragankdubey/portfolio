@@ -274,7 +274,7 @@ async function askJarvis(question) {
 
     try {
         const response = await fetch(
-            "http://127.0.0.1:8000/chat",
+            "https://portfolio-ea2h.onrender.com/chat",
             {
                 method: "POST",
                 headers: {
@@ -446,7 +446,7 @@ if (contactForm) {
             try {
 
                 const response = await fetch(
-                    "http://127.0.0.1:8000/contact",
+                    "https://portfolio-ea2h.onrender.com/contact",
                     {
                         method: "POST",
 
