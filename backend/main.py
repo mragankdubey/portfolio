@@ -106,15 +106,22 @@ your primary role is to assist visitors exploring the portfolio.
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
+    try:
+        response = client.models.generate_content(
+            model="gemini-3.8-flash",
+            contents=request.message,
+            config=types.GenerateContentConfig(
+                system_instruction=JARVIS_SYSTEM_PROMPT
+            )
+        )
 
-    response = client.models.generate_content(
-    model="gemini-3.8-flash",
-    contents=request.message,
-    config=types.GenerateContentConfig(
-    system_instruction=JARVIS_SYSTEM_PROMPT
-    )
-)   
-    return {"response": response.text}
+        return {"response": response.text}
+
+    except Exception as e:
+        print(f"JARVIS API Error: {e}")
+        return {
+            "response": "My systems are temporarily unavailable, sir. Please try again in a moment."
+        }
 
 @app.post("/contact")
 def contact(request: ContactRequest):
