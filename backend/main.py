@@ -5,8 +5,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 import os
-import smtplib
-from email.message import EmailMessage
+import resend
 
 
 load_dotenv()
@@ -125,44 +124,27 @@ async def chat(request: ChatRequest):
 
 @app.post("/contact")
 def contact(request: ContactRequest):
-
-    email = EmailMessage()
-
-    email["Subject"] = f"Portfolio Contact: {request.name}"
-    email["From"] = os.getenv("SMTP_EMAIL")
-    email["To"] = os.getenv("CONTACT_EMAIL")
-    email["Reply-To"] = request.email
-
-    email.set_content(
-        f"""
-NEW PORTFOLIO MESSAGE
-=====================
-
-Name:
-{request.name}
-
-Email:
-{request.email}
-
-Message:
-{request.message}
-
-=====================
-Sent from Mragank's Portfolio
-"""
-    )
-
     try:
-        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+        resend.api_key = os.getenv("RESEND_API_KEY")
 
-            server.starttls()
+        if not resend.api_key:
+            raise ValueError("RESEND_API_KEY is not configured")
 
-            server.login(
-                os.getenv("SMTP_EMAIL"),
-                os.getenv("SMTP_PASSWORD")
-            )
+        result = resend.Emails.send({
+            "from": "Mragank Portfolio <onboarding@resend.dev>",
+            "to": [os.getenv("CONTACT_EMAIL")],
+            "reply_to": request.email,
+            "subject": f"Portfolio Contact: {request.name}",
+            "text": (
+                "NEW PORTFOLIO MESSAGE\n\n"
+                f"Name: {request.name}\n"
+                f"Email: {request.email}\n\n"
+                f"Message:\n{request.message}\n\n"
+                "Sent from Mragank's Portfolio"
+            ),
+        })
 
-            server.send_message(email)
+        print("Contact email accepted by Resend:", result)
 
         return {
             "success": True,
@@ -170,12 +152,11 @@ Sent from Mragank's Portfolio
         }
 
     except Exception as error:
-
         print("Email error:", error)
 
         return {
             "success": False,
-            "message": "Unable to send message."
+            "message": "Unable to send message. Please try again later."
         }
 
 # cd backend
