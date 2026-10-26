@@ -132,7 +132,7 @@ def contact(request: ContactRequest):
 
         result = resend.Emails.send({
             "from": "Mragank Portfolio <onboarding@resend.dev>",
-            "to": [os.getenv("CONTACT_EMAIL")],
+            "to": ["mragankdubey10@gmail.com"],
             "reply_to": request.email,
             "subject": f"Portfolio Contact: {request.name}",
             "text": (
