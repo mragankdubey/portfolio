@@ -404,7 +404,7 @@
         </p>
     </div>
     <div class="project-pin-wrapper">
-        <div class="project-viewport">
+        <div class="project-viewport" id="project-viewport">
 
             <div class="project-track">
                 <!-- Mark-1 -->
@@ -596,9 +596,16 @@
         </div>
     </div>
 
+    <!-- Custom Stark HUD Horizontal Scrollbar -->
+    <div class="project-scrollbar-container" role="region" aria-label="Projects navigation">
+        <div class="project-scrollbar-track" id="project-scrollbar-track" role="scrollbar" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-controls="project-viewport" tabindex="0" aria-label="Drag or use arrow keys to explore projects">
+            <div class="project-scrollbar-thumb" id="project-scrollbar-thumb"></div>
+        </div>
+    </div>
+
     <div class="project-navigation">
         <span class="nav-line"></span>
-        <span>SCROLL // ARMOR SYSTEMS</span>
+        <span class="nav-scroll-label" role="button" tabindex="0" aria-label="Explore next project">SCROLL TO EXPLORE PROJECTS <span class="nav-arrow" aria-hidden="true">&rarr;</span></span>
         <span class="nav-line"></span>
     </div>
 

@@ -1,83 +1,347 @@
-// Iron-Man cursor system
+// Iron-Man cursor system (Desktop cursor + Mobile touch support)
 const ironmanContainer = document.querySelector(".ironman-container");
 const face = document.querySelector(".face");
 
 if (ironmanContainer && face) {
-    ironmanContainer.addEventListener("mousemove", (event) => {
-
+    function updateFaceReveal(clientX, clientY) {
         const rect = ironmanContainer.getBoundingClientRect();
-
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        const xPercent = (x / rect.width) * 100;
-        const yPercent = (y / rect.height) * 100;
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+        const xPercent = Math.min(Math.max((x / rect.width) * 100, 0), 100);
+        const yPercent = Math.min(Math.max((y / rect.height) * 100, 0), 100);
 
         face.style.clipPath =
             `circle(90px at ${xPercent}% ${yPercent}%)`;
+    }
 
+    ironmanContainer.addEventListener("mousemove", (event) => {
+        updateFaceReveal(event.clientX, event.clientY);
     });
 
     ironmanContainer.addEventListener("mouseleave", () => {
         face.style.clipPath =
             "circle(0px at 50% 50%)";
     });
+
+    // Mobile touch interaction: reveal face on tap/touch-drag without breaking desktop cursor
+    let touchTimeout = null;
+    ironmanContainer.addEventListener("touchstart", (event) => {
+        if (event.touches.length > 0) {
+            if (touchTimeout) clearTimeout(touchTimeout);
+            updateFaceReveal(event.touches[0].clientX, event.touches[0].clientY);
+        }
+    }, { passive: true });
+
+    ironmanContainer.addEventListener("touchmove", (event) => {
+        if (event.touches.length > 0) {
+            updateFaceReveal(event.touches[0].clientX, event.touches[0].clientY);
+        }
+    }, { passive: true });
+
+    ironmanContainer.addEventListener("touchend", () => {
+        touchTimeout = setTimeout(() => {
+            face.style.clipPath =
+                "circle(0px at 50% 50%)";
+        }, 1500);
+    }, { passive: true });
 }
 
 
-// Vertical -> Horizontal 
+// =========================================================
+// PROJECTS: MANUAL HORIZONTAL TRACK & SYNCHRONIZED SCROLLBAR
+// =========================================================
 
 (function () {
-    const pinWrapper      = document.querySelector(".project-pin-wrapper");
-    const projectViewport = document.querySelector(".project-viewport");
-    const projectTrack    = document.querySelector(".project-track");
+    const viewport = document.querySelector(".project-viewport");
+    const track = document.querySelector(".project-track");
+    const scrollbarTrack = document.getElementById("project-scrollbar-track");
+    const scrollbarThumb = document.getElementById("project-scrollbar-thumb");
+    const navLabel = document.querySelector(".nav-scroll-label");
 
-    if (!pinWrapper || !projectViewport || !projectTrack) return;
-    let maxHorizontal = 0; 
-    let targetX = 0;         
-    let currentX = 0;        
-    let rafId = null;
-    const EASE = 0.15;
+    if (!viewport || !track || !scrollbarTrack || !scrollbarThumb) return;
 
-    function calculateDistance() {
-        maxHorizontal = Math.max(
-            0,
-            projectTrack.scrollWidth - projectViewport.clientWidth
-        );
-        pinWrapper.style.height = `${window.innerHeight + maxHorizontal}px`;
-        requestFrame();
+    let isDragging = false;
+    let hasDragged = false;
+    let ignoreNextClick = false;
+    let startX = 0;
+    let startScrollLeft = 0;
+    let glideRafId = null;
+
+    // 1. Calculate and update thumb width and position
+    function updateThumb() {
+        const maxScroll = viewport.scrollWidth - viewport.clientWidth;
+        if (maxScroll <= 1) {
+            scrollbarTrack.style.opacity = "0.4";
+            scrollbarThumb.style.width = "100%";
+            scrollbarThumb.style.transform = "translateX(0px)";
+            return;
+        }
+        scrollbarTrack.style.opacity = "1";
+
+        const trackWidth = scrollbarTrack.clientWidth;
+        const visibleRatio = Math.min(viewport.clientWidth / viewport.scrollWidth, 1);
+        const thumbWidth = Math.max(44, Math.round(trackWidth * visibleRatio));
+        scrollbarThumb.style.width = `${thumbWidth}px`;
+
+        const scrollRatio = Math.min(Math.max(viewport.scrollLeft / maxScroll, 0), 1);
+        const maxThumbTravel = trackWidth - thumbWidth;
+        const thumbLeft = Math.round(scrollRatio * maxThumbTravel);
+
+        scrollbarThumb.style.transform = `translateX(${thumbLeft}px)`;
+
+        // Update ARIA progress
+        const percentNow = Math.round(scrollRatio * 100);
+        scrollbarTrack.setAttribute("aria-valuenow", String(percentNow));
     }
-    function requestFrame() {
-        if (rafId === null) {
-            rafId = requestAnimationFrame(frame);
+
+    // 2. High-performance, cancelable smooth gliding animation (quartic ease-out)
+    function cancelGlide() {
+        if (glideRafId !== null) {
+            cancelAnimationFrame(glideRafId);
+            glideRafId = null;
         }
     }
 
-    function frame() {
-        rafId = null;
-        if (maxHorizontal > 0) {
-            const rect = pinWrapper.getBoundingClientRect();
-            let progress = -rect.top / maxHorizontal;
-            progress = Math.min(Math.max(progress, 0), 1);
-            targetX = maxHorizontal * progress;
+    function smoothGlideTo(targetLeft, customDuration) {
+        cancelGlide();
 
+        const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+        const clampedTarget = Math.max(0, Math.min(Math.round(targetLeft), maxScroll));
+        const startLeft = viewport.scrollLeft;
+        const distance = clampedTarget - startLeft;
+
+        if (Math.abs(distance) < 1) {
+            viewport.scrollLeft = clampedTarget;
+            updateThumb();
+            return;
+        }
+
+        // Respect prefers-reduced-motion
+        const prefersReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (prefersReduced) {
+            viewport.scrollLeft = clampedTarget;
+            updateThumb();
+            return;
+        }
+
+        // Dynamic duration based on distance: short hops ~380ms, long sweeps ~650-700ms
+        const duration = customDuration || Math.min(700, Math.max(380, Math.round(Math.sqrt(Math.abs(distance)) * 16)));
+        let startTime = null;
+
+        function step(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // Quartic ease-out: rapid initial acceleration with silky, friction-damped deceleration
+            const ease = 1 - Math.pow(1 - progress, 4);
+
+            viewport.scrollLeft = Math.round(startLeft + distance * ease);
+            updateThumb();
+
+            if (progress < 1) {
+                glideRafId = requestAnimationFrame(step);
+            } else {
+                viewport.scrollLeft = clampedTarget;
+                updateThumb();
+                glideRafId = null;
+            }
+        }
+
+        glideRafId = requestAnimationFrame(step);
+    }
+
+    // Calculate individual card offsets for seamless card-by-card navigation
+    function getCardOffsets() {
+        const cards = Array.from(track.querySelectorAll(".project-card"));
+        if (!cards.length) return [];
+        const baseOffset = cards[0].offsetLeft;
+        return cards.map((c) => Math.max(0, c.offsetLeft - baseOffset));
+    }
+
+    function glideToNextCard() {
+        const offsets = getCardOffsets();
+        const current = viewport.scrollLeft;
+        const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+
+        if (!offsets.length) {
+            smoothGlideTo(Math.min(maxScroll, current + Math.round(viewport.clientWidth * 0.75)));
+            return;
+        }
+
+        const next = offsets.find((offset) => offset > current + 25);
+        if (next !== undefined) {
+            smoothGlideTo(next);
+        } else if (current < maxScroll - 25) {
+            smoothGlideTo(maxScroll);
         } else {
-            targetX = 0;
-        }
-        currentX += (targetX - currentX) * EASE;
-        if (Math.abs(targetX - currentX) < 0.4) {
-            currentX = targetX;
-        }
-        projectTrack.style.transform = `translate3d(${-currentX}px, 0, 0)`;
-        if (currentX !== targetX) {
-            requestFrame();
+            // Loop back to the first card once end of archive is reached
+            smoothGlideTo(0);
         }
     }
-    window.addEventListener("scroll", requestFrame, { passive: true });
-    window.addEventListener("resize", calculateDistance);
-    window.addEventListener("load", calculateDistance);
 
-    
-    calculateDistance();
+    function glideToPrevCard() {
+        const offsets = getCardOffsets();
+        const current = viewport.scrollLeft;
+
+        if (!offsets.length) {
+            smoothGlideTo(Math.max(0, current - Math.round(viewport.clientWidth * 0.75)));
+            return;
+        }
+
+        const prev = [...offsets].reverse().find((offset) => offset < current - 25);
+        if (prev !== undefined) {
+            smoothGlideTo(prev);
+        } else {
+            smoothGlideTo(0);
+        }
+    }
+
+    // 3. User interaction cancels running animation immediately for 100% manual responsiveness
+    viewport.addEventListener("touchstart", cancelGlide, { passive: true });
+    viewport.addEventListener("pointerdown", cancelGlide, { passive: true });
+    viewport.addEventListener("wheel", (e) => {
+        // If user scrolls horizontally via wheel/trackpad, cancel programmatic glide
+        if (Math.abs(e.deltaX) > 0) {
+            cancelGlide();
+        }
+    }, { passive: true });
+
+    // 4. Synchronize thumb on scroll, resize, and initial load
+    viewport.addEventListener("scroll", updateThumb, { passive: true });
+    window.addEventListener("resize", () => {
+        cancelGlide();
+        updateThumb();
+    });
+    window.addEventListener("load", updateThumb);
+
+    // 5. Dragging the thumb (Mouse & Touch) - instantaneous 1:1 direct tracking
+    function onDragStart(clientX) {
+        cancelGlide();
+        isDragging = true;
+        hasDragged = false;
+        startX = clientX;
+        startScrollLeft = viewport.scrollLeft;
+        document.body.classList.add("project-dragging");
+        scrollbarThumb.classList.add("is-dragging");
+    }
+
+    function onDragMove(clientX) {
+        if (!isDragging) return;
+        const deltaX = clientX - startX;
+        if (Math.abs(deltaX) > 2) {
+            hasDragged = true;
+        }
+        const trackWidth = scrollbarTrack.clientWidth;
+        const thumbWidth = scrollbarThumb.offsetWidth;
+        const maxThumbTravel = trackWidth - thumbWidth;
+        const maxScroll = viewport.scrollWidth - viewport.clientWidth;
+
+        if (maxThumbTravel <= 0 || maxScroll <= 0) return;
+
+        const scrollDelta = (deltaX / maxThumbTravel) * maxScroll;
+        viewport.scrollLeft = Math.round(startScrollLeft + scrollDelta);
+    }
+
+    function onDragEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+        document.body.classList.remove("project-dragging");
+        scrollbarThumb.classList.remove("is-dragging");
+
+        if (hasDragged) {
+            ignoreNextClick = true;
+            setTimeout(() => {
+                ignoreNextClick = false;
+            }, 80);
+        }
+    }
+
+    // Mouse events on thumb
+    scrollbarThumb.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        onDragStart(e.clientX);
+    });
+
+    window.addEventListener("mousemove", (e) => {
+        if (isDragging) {
+            e.preventDefault();
+            onDragMove(e.clientX);
+        }
+    });
+
+    window.addEventListener("mouseup", onDragEnd);
+
+    // Touch events on thumb
+    scrollbarThumb.addEventListener("touchstart", (e) => {
+        if (e.touches.length > 0) {
+            onDragStart(e.touches[0].clientX);
+        }
+    }, { passive: true });
+
+    window.addEventListener("touchmove", (e) => {
+        if (isDragging && e.touches.length > 0) {
+            onDragMove(e.touches[0].clientX);
+        }
+    }, { passive: true });
+
+    window.addEventListener("touchend", onDragEnd);
+
+    // 6. Click on track smoothly glides toward the target
+    scrollbarTrack.addEventListener("click", (e) => {
+        if (ignoreNextClick || isDragging) return;
+        if (e.target === scrollbarThumb) return;
+
+        const rect = scrollbarTrack.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const trackWidth = rect.width;
+        const thumbWidth = scrollbarThumb.offsetWidth;
+        const maxThumbTravel = trackWidth - thumbWidth;
+        const targetThumbLeft = clickX - thumbWidth / 2;
+        const ratio = Math.min(Math.max(targetThumbLeft / maxThumbTravel, 0), 1);
+        const maxScroll = viewport.scrollWidth - viewport.clientWidth;
+
+        smoothGlideTo(Math.round(ratio * maxScroll));
+    });
+
+    // 7. Interactive navigation label & arrow
+    if (navLabel) {
+        navLabel.addEventListener("click", () => {
+            glideToNextCard();
+        });
+
+        navLabel.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                glideToNextCard();
+            }
+        });
+    }
+
+    // 8. Keyboard accessibility on scrollbar track
+    scrollbarTrack.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            glideToPrevCard();
+        } else if (e.key === "ArrowRight") {
+            e.preventDefault();
+            glideToNextCard();
+        } else if (e.key === "Home") {
+            e.preventDefault();
+            smoothGlideTo(0);
+        } else if (e.key === "End") {
+            e.preventDefault();
+            smoothGlideTo(viewport.scrollWidth - viewport.clientWidth);
+        } else if (e.key === "PageDown") {
+            e.preventDefault();
+            smoothGlideTo(viewport.scrollLeft + Math.round(viewport.clientWidth * 0.8));
+        } else if (e.key === "PageUp") {
+            e.preventDefault();
+            smoothGlideTo(viewport.scrollLeft - Math.round(viewport.clientWidth * 0.8));
+        }
+    });
+
+    // Initial check
+    updateThumb();
 })();
 
 // Jarvis 
